@@ -1,0 +1,70 @@
+# nginx/nginx.conf.template
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+
+    sendfile on;
+    #tcp_nopush     on;
+
+    keepalive_timeout 65;
+
+    #gzip  on;
+
+    upstream llm_backend {
+        server portkey:8787; # Target Portkey Gateway service name and port
+    }
+
+    server {
+        listen 80; # Nginx listens on port 80 INSIDE the container
+        server_name localhost;
+
+        # CHANGE THIS LOCATION BLOCK:
+        # Match the specific path "/v1/chat/completions"
+        location /v1/chat/completions {
+            # Proxy to the base URL of the backend. Nginx will append
+            # the matched "/v1/chat/completions" from the client request.
+            proxy_pass http://llm_backend; # <-- No path here now
+
+            # Add the required custom headers
+            proxy_set_header x-portkey-provider "bedrock";
+            proxy_set_header x-portkey-aws-access-key-id "${AWS_ACCESS_KEY_ID}";
+            proxy_set_header x-portkey-aws-secret-access-key "${AWS_SECRET_ACCESS_KEY}";
+            proxy_set_header x-aws-region "${AWS_REGION}";
+
+            # Standard proxy headers
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Allow POST requests
+            limit_except POST { deny all; }
+
+            # Adjust proxy timeouts if necessary
+            proxy_connect_timeout 600s;
+            proxy_send_timeout 600s;
+            proxy_read_timeout 600s;
+            send_timeout 600s;
+        }
+
+        # OPTIONAL: You might want a default location for other paths or root
+        # location / {
+        #     return 404 "Not Found. Please use /v1/chat/completions";
+        # }
+    }
+}
