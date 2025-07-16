@@ -26,7 +26,7 @@ http {
     #gzip  on;
 
     upstream llm_backend {
-        server portkey:8787; # Target Portkey Gateway service name and port
+        server host.docker.internal:8787; # Target Portkey Gateway service name and port
     }
 
     server {

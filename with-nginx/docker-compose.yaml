@@ -21,11 +21,13 @@ services:
     command: ["nginx", "-g", "daemon off;"] # <-- CRITICAL CHANGE
     depends_on:
       - portkey
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - llm_network
 
   portkey:
-    image: portkeyai/gateway:metrics
+    image: portkeyai/gateway:latest
     container_name: portkey_gateway
     ports:
       - "8787:8787" # Portkey gateway listens on 8787
