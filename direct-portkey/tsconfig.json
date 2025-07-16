@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2022", // Or "es2021", "esnext" - modern JS features
+    "module": "NodeNext", // <--- CRUCIAL: Tells TS to use Node.js's ES Module resolution
+    "moduleResolution": "NodeNext", // <--- CRUCIAL: Tells TS how to find modules
+    "esModuleInterop": true, // Allows default imports from CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist", // Where compiled JS files will go
+    "rootDir": "./",
+    "allowJs": true, // Allow JS files in project (optional)
+    "resolveJsonModule": true // Allow importing JSON files (useful if you read JSON config)
+  },
+  "include": ["**/*.ts"], // Ensure your TS files are included
+  "exclude": ["node_modules"] // Exclude node_modules
+}
