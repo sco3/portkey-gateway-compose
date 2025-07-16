@@ -1,0 +1,22 @@
+{
+    // Launch configuration for running run-portkey.ts with ts-node
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run run-portkey.ts",
+            "program": "${workspaceFolder}/run-portkey.ts",
+            "runtimeArgs": [
+                "-r", "ts-node/register"
+            ],
+            "args": [
+                "eu-west-1", // region argument; change as needed
+                "3"           // repeat argument; change as needed
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
