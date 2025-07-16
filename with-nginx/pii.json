@@ -1,14 +1,14 @@
 {
-  "model": "anthropic.claude-3-sonnet-20240229-v1:0",
-  "temperature": 0,
-  "messages": [
-    {
-      "role": "system",
-      "content": "TASK: Redact any personally identifiable information (PII) from the given text. Redact addresses and names."
-    },
-    {
-      "role": "user",
-      "content": "Hello, I am commisaire Jouve from Paris."
-    }
-  ]
+    "model": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "temperature": 0,
+    "messages": [
+        {
+            "role": "system",
+            "content": "TASK: Redact any personally identifiable information (PII) from the given text. Redact addresses and names."
+        },
+        {
+            "role": "user",
+            "content": "Hello, I am commisaire Jouve from Paris."
+        }
+    ]
 }

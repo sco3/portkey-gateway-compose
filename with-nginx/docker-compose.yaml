@@ -1,44 +1,44 @@
 # docker-compose.yml
 # Remove the 'version: 3.8' line as it's obsolete
 services:
-  nginx-proxy:
-    image: nginx:latest
-    container_name: llm-nginx-proxy
-    ports:
-      - "8080:80" # Map host port 8080 to container port 80
-    volumes:
-      # Mount the GENERATED nginx.conf directly into the container's config path
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # <-- CRITICAL CHANGE
-    environment:
-      # These variables are still passed to the container but are no longer
-      # directly used by Nginx; they are used by the pre-generation step.
-      # You can remove them here if you prefer not to pass them to the container itself
-      # (though it doesn't hurt, and can be useful for debugging)
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=${AWS_REGION}
-    # Nginx can just start normally now
-    command: ["nginx", "-g", "daemon off;"] # <-- CRITICAL CHANGE
-    depends_on:
-      - portkey
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - llm_network
+    nginx-proxy:
+        image: nginx:latest
+        container_name: llm-nginx-proxy
+        ports:
+            - '8080:80' # Map host port 8080 to container port 80
+        volumes:
+            # Mount the GENERATED nginx.conf directly into the container's config path
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # <-- CRITICAL CHANGE
+        environment:
+            # These variables are still passed to the container but are no longer
+            # directly used by Nginx; they are used by the pre-generation step.
+            # You can remove them here if you prefer not to pass them to the container itself
+            # (though it doesn't hurt, and can be useful for debugging)
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_REGION=${AWS_REGION}
+        # Nginx can just start normally now
+        command: ['nginx', '-g', 'daemon off;'] # <-- CRITICAL CHANGE
+        depends_on:
+            - portkey
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        networks:
+            - llm_network
 
-  portkey:
-    image: portkeyai/gateway:latest
-    container_name: portkey_gateway
-    ports:
-      - "8787:8787" # Portkey gateway listens on 8787
-    environment:
-      # Pass AWS keys to Portkey if it's making direct Bedrock calls
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=${AWS_REGION}
-    networks:
-      - llm_network
+    portkey:
+        image: portkeyai/gateway:aws-env
+        container_name: portkey_gateway
+        ports:
+            - '8787:8787' # Portkey gateway listens on 8787
+        environment:
+            # Pass AWS keys to Portkey if it's making direct Bedrock calls
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_REGION=${AWS_REGION}
+        networks:
+            - llm_network
 
 networks:
-  llm_network:
-    driver: bridge
+    llm_network:
+        driver: bridge
