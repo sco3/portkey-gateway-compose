@@ -61,17 +61,9 @@ async function runConcurrentOpenAIRequests(repeat: number = 1) {
                     // Use latency from response.metrics if available, otherwise fallback to measured value
                     //const latency = parseInt(response.metrics?.latencyMs ?? took);
                     // Output a structured log with metrics for gateway compatibility
-                    const logObj = {
-                        provider: "openai-ts",
-                        model: process.env.OPENAI_MODEL || "anthropic.claude-3-haiku-20240307-v1:0",
-                        responseId: response.id,
-                        metrics: {
-                            startUtc: taskStartUtc,
-                            latencyMs: took,
-                        },
-                        status: "success"
-                    };
-                    console.log(JSON.stringify(logObj));
+                    console.log(
+                        `openai-ts region=${region} model=${process.env.OPENAI_MODEL || "anthropic.claude-3-haiku-20240307-v1:0"} responseId=${response.id} startUtc=${taskStartUtc} latencyMs=${took} status=success`
+                    );
                 } catch (err) {
                     console.error("OpenAI request error for", fileName, err);
                 }
