@@ -22,7 +22,7 @@ async function runConcurrentOpenAIRequests(repeat: number = 1) {
         apiKey: "sk-1234",
         defaultHeaders: {
             "x-portkey-provider": "bedrock",
-            "x-aws-region": region
+            "x-portkey-aws-region": region
         }
     });
     console.log("Starting concurrent OpenAI requests...");

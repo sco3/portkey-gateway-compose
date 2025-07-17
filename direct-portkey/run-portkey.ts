@@ -11,7 +11,7 @@ import Portkey from "portkey-ai"; // Import the Portkey SDK
  */
 async function runConcurrentRequests(repeat: number = 1) {
     dotenv.config();
-    const region = process.argv[1] || "eu-west-1";
+    const region = process.argv[1] || "us-east-1";
     const PORTKEY_CONFIG = {
         baseUrl: "http://localhost:8787",
         provider: "bedrock",
