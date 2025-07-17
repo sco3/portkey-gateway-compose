@@ -11,7 +11,7 @@ import Portkey from "portkey-ai"; // Import the Portkey SDK
  */
 async function runConcurrentRequests(repeat: number = 1) {
     dotenv.config();
-    const region = process.argv[1] || "us-east-1";
+    const region = process.argv[2] || "us-east-1";
     const PORTKEY_CONFIG = {
         baseUrl: "http://localhost:8787",
         provider: "bedrock",
@@ -39,22 +39,25 @@ async function runConcurrentRequests(repeat: number = 1) {
                 const filePath = path.join(".", fileName);
                 let requestContent: string = "";
                 let requestPayload: any;
+                try {
+                    requestContent = await fs.readFile(filePath, "utf8");
+                    requestPayload = JSON.parse(requestContent);
+                    const taskStartUtc = new Date().toISOString();
+                    const startTime = performance.now();
+                    const model = "anthropic.claude-3-haiku-20240307-v1:0";
+                    const response = await portkey.chat.completions.create({
+                        messages: requestPayload,
+                        model: model,
+                    });
 
-                requestContent = await fs.readFile(filePath, "utf8");
-                requestPayload = JSON.parse(requestContent);
-                const taskStartUtc = new Date().toISOString();
-                const startTime = performance.now();
-                const model = "anthropic.claude-3-haiku-20240307-v1:0";
-                const response = await portkey.chat.completions.create({
-                    messages: requestPayload,
-                    model: model,
-                });
+                    const took = Math.trunc(performance.now() - startTime);
+                    const latency = parseInt(response.metrics?.latencyMs ?? 0);
+                    const delta = took - latency;
 
-                const took = Math.trunc(performance.now() - startTime);
-                const latency = parseInt(response.metrics?.latencyMs ?? 0);
-                const delta = took - latency;
-
-                console.log("portkey-ts", region, model, "StartUTC:", taskStartUtc, "Took:", took, "Latency", latency, delta);
+                    console.log("portkey-ts", region, model, "StartUTC:", taskStartUtc, "Took:", took, "Latency", latency, delta);
+                } catch (err) {
+                    console.error(`Portkey request error for ${fileName}:`, err);
+                }
             })());
         }
     }
